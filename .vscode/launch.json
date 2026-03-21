@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-Application<retoback>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "reto.Application",
+      "projectName": "retoback",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
