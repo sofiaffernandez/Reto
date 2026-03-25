@@ -104,13 +104,53 @@ public class EventoRestController {
     }
   }
 
+  //eventos/destacados
+  @GetMapping("/destacados")
+  public ResponseEntity<?> destacados () {
+    try {
+      return ResponseEntity.ok(eventoService.findDestacados());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos destacados");
+    }
+  }
+  
+  //eventos/activos
+  @GetMapping("/activos")
+  public ResponseEntity<?> activos () {
+    try {
+      return ResponseEntity.ok(eventoService.findActivos());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos activos");
+    }
+  }
+
+  //eventos/cancelados
+  @GetMapping("/cancelados")  
+  public ResponseEntity<?> cancelados () {
+    try {
+      return ResponseEntity.ok(eventoService.findCancelados());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos cancelados");
+    }
+  }
+
+  //eventos/tipo/{tipo}
+  @GetMapping("/tipo/{tipo}")
+  public ResponseEntity<?> tipo (@PathVariable String tipo) {
+    try {
+      return ResponseEntity.ok(eventoService.findByTipo(tipo));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos por tipo");
+    }
+  }
+
+
   // Otros endpoitns que creo que vamos a neceseitar 
   //eventos/buscar filtros //busqueda
-  //eventos/destacados
-  //eventos/activos
-  //eventos/cancelados
-
+  
   //Crud de usuarios 
+
+  
   
 
 

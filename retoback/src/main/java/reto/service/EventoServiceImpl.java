@@ -41,4 +41,26 @@ public class EventoServiceImpl implements EventoService {
     }
     return null;
   }
+
+  @Override
+  public List<Evento> findDestacados() {
+    return eventoRepo.findDestacados();
+  }
+
+  @Override
+  public List<Evento> findByTipo(String tipo) { 
+    return eventoRepo.findByTipo(tipo);
+  }
+
+  @Override
+  public List<Evento> findActivos() {
+    return eventoRepo.findActivos();
+  }
+
+  @Override
+  public List<Evento> findCancelados() {
+    return eventoRepo.findCancelados();
+  }
+
+  
 }

@@ -19,4 +19,16 @@ public interface  EventoService {
   Evento cancelOne(Integer idEvento);
 
   List <Evento> findAll();
+
+  //eventos/destacados
+  List <Evento> findDestacados();
+
+  //eventos/tipo/{tipo}
+  List <Evento> findByTipo(String tipo);
+
+  //eventos/activos
+  List <Evento> findActivos();
+
+  //eventos/cancelados
+  List <Evento> findCancelados();
 }
