@@ -1,11 +1,11 @@
 package reto.service;
+
 import java.util.List;
 
 import reto.entities.Evento;
 
 public interface  EventoService {
   
-
   //eventos/detalle/{id}
   Evento findById(Integer idEvento);
 
@@ -31,4 +31,8 @@ public interface  EventoService {
 
   //eventos/cancelados
   List <Evento> findCancelados();
+
+  List<Evento> findTerminados();
+
+  List<Evento>findByEstado(String estado);
 }

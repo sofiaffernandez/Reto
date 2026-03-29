@@ -1,66 +1,93 @@
 package reto.service;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import reto.entities.Evento;
 import reto.repository.EventoRepository;
 
-
+@Service
 public class EventoServiceImpl implements EventoService {
+    @Autowired
+    private EventoRepository eventoRepository;
 
-  @Autowired
-  private EventoRepository eventoRepo;
 
-  @Override
-  public Evento findById(Integer idEvento) {
-    return eventoRepo.findById(idEvento).orElse(null);
-  }
-
-  @Override
-  public List<Evento> findAll() {
-    return eventoRepo.findAll();
-  }
-
-  @Override
-  public Evento insertOne(Evento evento) {
-    return eventoRepo.insertOne(evento);
-  }
-
-  @Override
-  public Evento updateOne(Evento evento) {
-    return eventoRepo.updateOne(evento);
-  }
-
-  @Override
-  public Evento cancelOne(Integer idEvento) {
-    Evento evento = eventoRepo.findById(idEvento).orElse(null);
-    if (evento != null) {
-      evento.setEstado("cancelado");
-      return eventoRepo.updateOne(evento);
+    @Override
+    public Evento findById(Integer idEvento) {
+        return eventoRepository.findById(idEvento).orElse(null);
     }
-    return null;
-  }
 
-  @Override
-  public List<Evento> findDestacados() {
-    return eventoRepo.findDestacados();
-  }
+    @Override
+    public List<Evento> findAll() {
+        return eventoRepository.findAll();
+    }
 
-  @Override
-  public List<Evento> findByTipo(String tipo) { 
-    return eventoRepo.findByTipo(tipo);
-  }
+    @Override
+    public Evento insertOne(Evento evento) {
+        return eventoRepository.save(evento);
+    }
 
-  @Override
-  public List<Evento> findActivos() {
-    return eventoRepo.findActivos();
-  }
+    @Override
+    public Evento updateOne(Evento evento) {
+        return eventoRepository.findById(evento.getIdEvento())
+            .map(existente -> {
+                existente.setNombre(evento.getNombre());
+                existente.setDescripcion(evento.getDescripcion());
+                existente.setFechaInicio(evento.getFechaInicio());
+                existente.setDuracion(evento.getDuracion());
+                existente.setDireccion(evento.getDireccion());
+                existente.setEstado(evento.getEstado());
+                existente.setDestacado(evento.getDestacado());
+                existente.setAforoMaximo(evento.getAforoMaximo());
+                existente.setMinimoAsistencia(evento.getMinimoAsistencia());
+                existente.setPrecio(evento.getPrecio());
+                existente.setTipo(evento.getTipo());
+                return eventoRepository.save(existente);
+            })
+            .orElse(null);
+    }
 
-  @Override
-  public List<Evento> findCancelados() {
-    return eventoRepo.findCancelados();
-  }
 
-  
+    @Override
+    public Evento cancelOne(Integer idEvento) {
+        Evento evento = eventoRepository.findById(idEvento).orElse(null);
+        if (evento != null) {
+            evento.setEstado("cancelado");
+            return eventoRepository.save(evento);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Evento> findDestacados() {
+        return eventoRepository.findDestacados();
+    }
+
+    @Override
+    public List<Evento> findByTipo(String tipo) { 
+        return eventoRepository.findByTipo(tipo);
+    }
+
+    @Override
+    public List<Evento> findActivos() {
+        return eventoRepository.findActivos();
+    }
+
+    @Override
+    public List<Evento> findCancelados() {
+        return eventoRepository.findCancelados();
+    }
+
+    @Override
+    public List<Evento> findTerminados() {
+        return eventoRepository.findTerminados();
+    }
+
+    @Override
+    public List<Evento> findByEstado(String estado) {
+        return eventoRepository.findByEstado(estado);
+    }
+
 }

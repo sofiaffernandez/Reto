@@ -1,0 +1,24 @@
+package reto.service;
+
+import reto.entities.Usuario;
+
+
+public interface UsuarioService {
+
+  // CRUD USUARIO ADMIN
+
+  //CREATE
+    Usuario createOne(Usuario usuario);
+  //READ
+    Usuario findByUsername(String username);
+  //UPDATE
+    Usuario updateOne(Usuario usuario);
+  //DELETE
+  Usuario deleteOne(String username);
+  
+
+  //buscar por rol y modificar el rol de un usuario
+  //List<UsuarioPerfilDto> findByRole(String role);
+ void updateUserRole(String username, String nuevoRol);
+
+}
