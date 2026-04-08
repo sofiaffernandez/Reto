@@ -3,14 +3,35 @@ package reto.restcontroller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import reto.entities.Perfil;
 import reto.entities.Usuario;
+import reto.entities.UsuarioPerfil;
+import reto.repository.PerfilRepository;
+import reto.repository.UsuarioPerfilRepository;
 import reto.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioRestController {
+
+    @Autowired
+    private PerfilRepository perfilRepository;
+
+    @Autowired
+    private UsuarioPerfilRepository usuarioPerfilRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     private UsuarioService usuarioService;
@@ -19,8 +40,19 @@ public class UsuarioRestController {
     @PostMapping("/alta")
     public ResponseEntity<?> alta(@RequestBody Usuario usuario) {
         try {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
             Usuario nuevoUsuario = usuarioService.createOne(usuario);
             if (nuevoUsuario != null) {
+                // Asignar perfil CLIENTE (esto lo pongo automático, me imagino que debe ser asi, podemos revisar)
+                Perfil perfilCliente = perfilRepository.findByNombre("CLIENTE");
+                if (perfilCliente == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Perfil CLIENTE no existe");
+                }
+                UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
+                        .usuario(nuevoUsuario)
+                        .perfil(perfilCliente)
+                        .build();
+                usuarioPerfilRepository.save(usuarioPerfil);
                 return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya existe");
