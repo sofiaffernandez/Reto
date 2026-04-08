@@ -1,9 +1,11 @@
 package reto.service;
+import java.util.List;
 
 import reto.entities.Usuario;
 
 
 public interface UsuarioService {
+  List<String> getRolesUsuario(Usuario usuario);
 
   // CRUD USUARIO ADMIN
 
