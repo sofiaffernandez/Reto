@@ -23,7 +23,7 @@ public class Tipos {
     @Column(name = "id_tipo")
     private Integer idTipo;
 
-    @Column(name = "nombre", length = 45)
+    @Column(name = "nombre", length = 45, nullable = false)
     private String nombre;
 
     @Column(name = "descripcion", length = 200)

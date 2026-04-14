@@ -13,7 +13,6 @@ public class EventoServiceImpl implements EventoService {
     @Autowired
     private EventoRepository eventoRepository;
 
-
     @Override
     public Evento findById(Integer idEvento) {
         return eventoRepository.findById(idEvento).orElse(null);
@@ -32,23 +31,22 @@ public class EventoServiceImpl implements EventoService {
     @Override
     public Evento updateOne(Evento evento) {
         return eventoRepository.findById(evento.getIdEvento())
-            .map(existente -> {
-                existente.setNombre(evento.getNombre());
-                existente.setDescripcion(evento.getDescripcion());
-                existente.setFechaInicio(evento.getFechaInicio());
-                existente.setDuracion(evento.getDuracion());
-                existente.setDireccion(evento.getDireccion());
-                existente.setEstado(evento.getEstado());
-                existente.setDestacado(evento.getDestacado());
-                existente.setAforoMaximo(evento.getAforoMaximo());
-                existente.setMinimoAsistencia(evento.getMinimoAsistencia());
-                existente.setPrecio(evento.getPrecio());
-                existente.setTipo(evento.getTipo());
-                return eventoRepository.save(existente);
-            })
-            .orElse(null);
+                .map(existente -> {
+                    existente.setNombre(evento.getNombre());
+                    existente.setDescripcion(evento.getDescripcion());
+                    existente.setFechaInicio(evento.getFechaInicio());
+                    existente.setDuracion(evento.getDuracion());
+                    existente.setDireccion(evento.getDireccion());
+                    existente.setEstado(evento.getEstado());
+                    existente.setDestacado(evento.getDestacado());
+                    existente.setAforoMaximo(evento.getAforoMaximo());
+                    existente.setMinimoAsistencia(evento.getMinimoAsistencia());
+                    existente.setPrecio(evento.getPrecio());
+                    existente.setTipo(evento.getTipo());
+                    return eventoRepository.save(existente);
+                })
+                .orElse(null);
     }
-
 
     @Override
     public Evento cancelOne(Integer idEvento) {
@@ -62,27 +60,27 @@ public class EventoServiceImpl implements EventoService {
 
     @Override
     public List<Evento> findDestacados() {
-        return eventoRepository.findDestacados();
+        return eventoRepository.findByDestacado("S");
     }
 
     @Override
-    public List<Evento> findByTipo(String tipo) { 
-        return eventoRepository.findByTipo(tipo);
+    public List<Evento> findByTipo(String tipo) {
+        return eventoRepository.findByTipoNombre(tipo);
     }
 
     @Override
     public List<Evento> findActivos() {
-        return eventoRepository.findActivos();
+        return eventoRepository.findByEstado("ACTIVO");
     }
 
     @Override
     public List<Evento> findCancelados() {
-        return eventoRepository.findCancelados();
+        return eventoRepository.findByEstado("CANCELADO");
     }
 
     @Override
     public List<Evento> findTerminados() {
-        return eventoRepository.findTerminados();
+        return eventoRepository.findByEstado("TERMINADO");
     }
 
     @Override

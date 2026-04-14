@@ -87,12 +87,12 @@ public class ClienteRestController {
         if (evento == null) {
             return ResponseEntity.badRequest().body("Evento no encontrado.");
         }
-        int totalReservas = reservaRepository.findById(id).stream().mapToInt(Reserva::getCantidad).sum();
+        int totalReservas = reservaRepository.findByEvento(evento).stream().mapToInt(Reserva::getCantidad).sum();
         if (totalReservas + cantidad > evento.getAforoMaximo()) {
             return ResponseEntity.badRequest().body("No hay suficientes plazas disponibles para este evento.");
         }
         String username = principal.getName();
-        List<Reserva> reservasCliente = reservaRepository.findByEventoIdAndUsuarioUsername(id, username);
+        List<Reserva> reservasCliente = reservaRepository.findByEventoAndUsuarioUsername(evento, username);
         int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
         if (reservasPrevias >= 10) {
             return ResponseEntity.badRequest().body("Ya tienes una reserva de 10 plazas para este evento.");
