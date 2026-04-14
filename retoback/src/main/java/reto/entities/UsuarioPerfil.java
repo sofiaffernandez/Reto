@@ -6,13 +6,17 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "usuario_perfiles")
+@Table(
+    name = "usuario_perfiles",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"username", "id_perfil"})
+)
 @IdClass(UsuarioPerfilId.class)
 @Data
 @NoArgsConstructor
@@ -22,12 +26,12 @@ public class UsuarioPerfil {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "username", nullable = false)
     private Usuario usuario;
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "id_perfil")
+    @JoinColumn(name = "id_perfil", nullable = false)
     private Perfil perfil;
 
 }
