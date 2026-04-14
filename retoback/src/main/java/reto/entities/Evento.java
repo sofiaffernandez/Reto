@@ -30,13 +30,13 @@ public class Evento {
 	@Column(name = "id_evento")
 	private Integer idEvento;
 
-	@Column(name = "nombre", length = 50)
+	@Column(name = "nombre", length = 50, nullable = false)
 	private String nombre;
 
 	@Column(name = "descripcion", length = 200)
 	private String descripcion;
 
-	@Column(name = "fecha_inicio")
+	@Column(name = "fecha_inicio", nullable = false)
 	private LocalDate fechaInicio;
 
 	@Column(name = "duracion")
@@ -51,13 +51,13 @@ public class Evento {
 	@Column(name = "destacado", length = 1)
 	private String destacado;
 
-	@Column(name = "aforo_maximo")
+	@Column(name = "aforo_maximo", nullable = false)
 	private Integer aforoMaximo;
 
 	@Column(name = "minimo_asistencia")
 	private Integer minimoAsistencia;
 
-	@Column(name = "precio", precision = 9, scale = 2)
+	@Column(name = "precio", precision = 9, scale = 2, nullable = false)
 	private BigDecimal precio;
 
 	@ManyToOne(fetch = FetchType.LAZY)

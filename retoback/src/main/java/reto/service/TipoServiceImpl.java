@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reto.entities.Tipos;
 import reto.repository.TipoRepository;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class TipoServiceImpl implements TipoService {
   @Autowired
   private TipoRepository tipoRepo;
