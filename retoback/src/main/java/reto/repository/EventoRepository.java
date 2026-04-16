@@ -1,6 +1,7 @@
 package reto.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import reto.entities.Evento;
 
 public interface EventoRepository extends JpaRepository<Evento, Integer> {
-  Evento findbyId(Integer idEvento);
-  Evento insertOne(Evento evento);
-  Evento updateOne(Evento evento);
+ // Optional<Evento> findById(Integer idEvento);
+  //Evento insertOne(Evento evento);
+  //Evento updateOne(Evento evento);
   
   //eventos/tipo/{tipo}
   List<Evento> findByTipo(String tipo);
