@@ -50,19 +50,35 @@ public class EventoRestController {
   
 
   ///eventos/editar/{id}
-   @PutMapping("/editar/{id}")
-   public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody Evento evento) {
-    try {
-      Evento updateEvento = eventoService.updateOne(evento);
-      if (updateEvento != null) {
-        return ResponseEntity.ok(updateEvento);
-      } else {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
-      }
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar el evento");
+@PutMapping("/editar/{id}")
+public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDto eventoDto) {
+  try {
+    Evento evento = new Evento();
+    evento.setIdEvento(id);
+    evento.setNombre(eventoDto.getNombre());
+    evento.setDescripcion(eventoDto.getDescripcion());
+    evento.setFechaInicio(eventoDto.getFechaInicio());
+    evento.setDuracion(eventoDto.getDuracion());
+    evento.setDireccion(eventoDto.getDireccion());
+    evento.setEstado(eventoDto.getEstado());
+    evento.setDestacado(eventoDto.getDestacado());
+    evento.setAforoMaximo(eventoDto.getAforoMaximo());
+    evento.setMinimoAsistencia(eventoDto.getMinimoAsistencia());
+    evento.setPrecio(eventoDto.getPrecio());
+    Tipos tipo = new Tipos();
+    tipo.setIdTipo(eventoDto.getIdTipo());
+    evento.setTipo(tipo);
+
+    Evento updateEvento = eventoService.updateOne(evento);
+    if (updateEvento != null) {
+      return ResponseEntity.ok(updateEvento);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
     }
-  } 
+  } catch (Exception e) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar el evento");
+  }
+}
 
   ///eventos/cancelar/{id}
   @PutMapping("/cancelar/{id}")

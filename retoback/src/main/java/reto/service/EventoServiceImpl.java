@@ -56,7 +56,7 @@ public class EventoServiceImpl implements EventoService {
     public Evento cancelOne(Integer idEvento) {
         Evento evento = eventoRepository.findById(idEvento).orElse(null);
         if (evento != null) {
-            evento.setEstado("cancelado");
+            evento.setEstado("CANCELADO");
             return eventoRepository.save(evento);
         }
         return null;
