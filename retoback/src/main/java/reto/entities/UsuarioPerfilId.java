@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class UsuarioPerfilId implements Serializable {
     private String usuario;
     private Integer perfil;
-
     @Override
     public boolean equals(Object o) {
         if (this == o)

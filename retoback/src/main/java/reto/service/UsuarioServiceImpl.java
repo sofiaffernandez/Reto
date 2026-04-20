@@ -1,5 +1,6 @@
 package reto.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,9 +9,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import reto.dto.AuthResponseDto;
+import reto.dto.LoginRequestDto;
 import reto.entities.Perfil;
 import reto.entities.Usuario;
 import reto.entities.UsuarioPerfil;
+import reto.security.JwtService;
 import reto.repository.PerfilRepository;
 import reto.repository.UsuarioPerfilRepository;
 import reto.repository.UsuarioRepository;
@@ -28,12 +32,8 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  // CREATE Usuario createOne(Usuario usuario);
-  @Override
-  public Usuario createOne(Usuario usuario) {
-    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-    return usuarioRepository.save(usuario);
-  }
+  @Autowired
+  private JwtService jwtService;
 
   // READ Usuario findByUsername(String username);
   @Override
@@ -107,6 +107,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     if (usuarioRepository.existsById(usuario.getUsername())) {
       throw new IllegalArgumentException("El usuario ya existe");
     }
+// Comprobar duplicado por email, no tiene mas logica?
+    if (usuarioRepository.existsByEmailIgnoreCase(usuario.getEmail())) {
+      throw new IllegalArgumentException("El email ya está registrado");
+    }
+
+    if (usuario.getEnabled() == null) {
+      usuario.setEnabled(1);
+    }
+
+    if (usuario.getFechaRegistro() == null) {
+      usuario.setFechaRegistro(LocalDate.now());
+    }
 
     usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
     Usuario saved = usuarioRepository.save(usuario);
@@ -119,5 +131,52 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     return saved;
   }
+
+  @Transactional
+  @Override
+  public AuthResponseDto registrarCliente(Usuario usuario) {
+    Perfil perfilCliente = perfilRepository.findByNombre("ROLE_CLIENTE");
+    if (perfilCliente == null) {
+      throw new IllegalStateException("Perfil CLIENTE no existe");
+    }
+
+    Usuario nuevoUsuario = createUsuarioConPerfil(usuario, perfilCliente);
+    List<String> roles = getRolesUsuario(nuevoUsuario);
+    String token = jwtService.generateToken(nuevoUsuario.getUsername(), roles);
+
+    return AuthResponseDto.builder()
+        .token(token)
+        .tokenType("Bearer")
+        .username(nuevoUsuario.getUsername())
+        .email(nuevoUsuario.getEmail())
+        .roles(roles)
+        .message("Usuario creado correctamente")
+        .build();
+  }
+
+  @Override
+  public AuthResponseDto login(LoginRequestDto loginRequest) {
+    Usuario usuario = findByUsername(loginRequest.getUsername());
+    if (usuario == null) {
+      throw new IllegalArgumentException("Credenciales inválidas");
+    }
+
+    if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
+      throw new IllegalArgumentException("Credenciales inválidas");
+    }
+
+    List<String> roles = getRolesUsuario(usuario);
+    String token = jwtService.generateToken(usuario.getUsername(), roles);
+
+    return AuthResponseDto.builder()
+        .token(token)
+        .tokenType("Bearer")
+        .username(usuario.getUsername())
+        .email(usuario.getEmail())
+        .roles(roles)
+        .message("Login correcto")
+        .build();
+  }
+
 
 }

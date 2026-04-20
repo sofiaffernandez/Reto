@@ -141,7 +141,7 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/cancelados
+  // eventos/cancelados
   @GetMapping("/cancelados")  
   public ResponseEntity<?> cancelados () {
     try {

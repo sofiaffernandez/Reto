@@ -1,40 +1,39 @@
 package reto.security;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import jakarta.annotation.PostConstruct;
-import reto.entities.Usuario;
-import reto.service.UsuarioService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-   
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    private JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @PostConstruct
     public void init() {
         System.out.println("Cargando la configuración de seguridad...");
     }
-    
-    
-     PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
-   
 
 
     @Bean
@@ -45,12 +44,17 @@ public class SecurityConfig {
             config.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
             config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
             config.setAllowedHeaders(java.util.List.of("*"));
+            config.setAllowCredentials(true);
             return config;
         }))
             .csrf(csrf -> csrf.disable())
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
             .authorizeHttpRequests(auth -> auth
-                //.requestMatchers("/eventos/listado").permitAll()
-                .requestMatchers("/usuarios/alta", "/login").permitAll()
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/usuarios/alta", "/usuarios/login").permitAll()
                 .requestMatchers("/eventos", "/eventos/", "/eventos/detalle/**").permitAll()
                 .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados").permitAll()
                 .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**", "/eventos/eliminar/**").hasRole("ADMON")
@@ -58,7 +62,7 @@ public class SecurityConfig {
                 .requestMatchers("/clientes/**").hasRole("CLIENTE")
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults());
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

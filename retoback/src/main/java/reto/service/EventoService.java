@@ -3,6 +3,7 @@ package reto.service;
 import java.util.List;
 
 import reto.entities.Evento;
+import reto.entities.Reserva;
 
 public interface  EventoService {
   
@@ -14,9 +15,9 @@ public interface  EventoService {
 
   ///eventos/editar/{id}
   Evento updateOne(Evento evento);
-  
-  void deleteOne(Integer idEvento);
 
+  void deleteOne(Integer idEvento);
+  
   ///eventos/cancelar/{id}
   Evento cancelOne(Integer idEvento);
 
@@ -37,4 +38,6 @@ public interface  EventoService {
   List<Evento> findTerminados();
 
   List<Evento>findByEstado(String estado);
+
+  Reserva crearReserva(Integer idEvento, int cantidad, String username);
 }
