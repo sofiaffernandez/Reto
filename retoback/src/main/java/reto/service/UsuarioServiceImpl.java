@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import reto.entities.Perfil;
@@ -22,10 +23,14 @@ public class UsuarioServiceImpl implements UsuarioService {
   private UsuarioPerfilRepository usuarioPerfilRepository;
   @Autowired
   private PerfilRepository perfilRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
   
   // CREATE Usuario createOne(Usuario usuario);
   @Override
   public Usuario createOne(Usuario usuario) {
+    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
     return usuarioRepository.save(usuario);
   }
   

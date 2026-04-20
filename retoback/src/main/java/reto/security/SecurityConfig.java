@@ -1,4 +1,4 @@
-package security;
+package reto.security;
 
 import java.util.Arrays;
 
@@ -22,8 +22,7 @@ import reto.service.UsuarioService;
 @EnableWebSecurity
 public class SecurityConfig {
 
-      @Autowired
-    private UsuarioService usuarioService;
+   
 
 
     @PostConstruct
@@ -31,57 +30,32 @@ public class SecurityConfig {
         System.out.println("Cargando la configuración de seguridad...");
     }
     
-    @Bean
+    
      PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();  
     }
-     
-    @Bean
-     UserDetailsService userDetailsService() {
-        return username -> {
-            System.out.println("Buscando usuario: " + username); 
-
-            Usuario usuario = usuarioService.findByUsername(username);
-            if (usuario == null) {
-                System.out.println("Usuario no encontrado: " + username);
-                throw new RuntimeException("Usuario no encontrado");
-            }
-
-            String[] roles = usuarioService.getRolesUsuario(usuario)
-                .stream()
-                .map(role -> role) 
-                .toArray(String[]::new);
-
-            System.out.println("Usuario encontrado: " + usuario.getUsername() + " con roles: " + Arrays.toString(roles)); 
-
-            return User.builder()
-                    .username(usuario.getUsername())
-                    .password(usuario.getPassword())
-                    .roles(roles)
-                    .build();
-        };
-    }
+   
 
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+          .cors(cors -> cors.configurationSource(request -> {
+            var config = new org.springframework.web.cors.CorsConfiguration();
+            config.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
+            config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
+            config.setAllowedHeaders(java.util.List.of("*"));
+            return config;
+        }))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Invitado: 
+                //.requestMatchers("/eventos/listado").permitAll()
                 .requestMatchers("/eventos", "/eventos/", "/eventos/detalle/**").permitAll()
                 .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados").permitAll()
-
-                // admin: solo ADMIN
-                .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**").hasRole("ADMIN")
-                .requestMatchers("/usuarios/**").hasRole("ADMIN")
-
-                // Cliente: acceso a rutas de clientes
+                .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**", "/eventos/eliminar/**").hasRole("ADMON")
+                .requestMatchers("/usuarios/**").hasRole("ADMON")
                 .requestMatchers("/clientes/**").hasRole("CLIENTE")
-
-                // Registro de usuarios permitido a todos (login y registro)
                 .requestMatchers("/usuarios/crear", "/login").permitAll()
-
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());

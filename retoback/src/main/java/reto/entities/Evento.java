@@ -60,7 +60,7 @@ public class Evento {
 	@Column(name = "precio", precision = 9, scale = 2, nullable = false)
 	private BigDecimal precio;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_tipo")
 	private Tipos tipo;
 }

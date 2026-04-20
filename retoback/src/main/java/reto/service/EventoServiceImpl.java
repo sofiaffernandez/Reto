@@ -3,7 +3,9 @@ package reto.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 import reto.entities.Evento;
 import reto.repository.EventoRepository;
@@ -52,7 +54,7 @@ public class EventoServiceImpl implements EventoService {
     public Evento cancelOne(Integer idEvento) {
         Evento evento = eventoRepository.findById(idEvento).orElse(null);
         if (evento != null) {
-            evento.setEstado("cancelado");
+            evento.setEstado("CANCELADO");
             return eventoRepository.save(evento);
         }
         return null;
@@ -88,4 +90,12 @@ public class EventoServiceImpl implements EventoService {
         return eventoRepository.findByEstado(estado);
     }
 
+    public Evento deleteOne(Long id) {
+        Evento evento = eventoRepository.findById(idEvento).orElse(null);
+        if (evento != null) {
+            eventoRepository.deleteById(id);
+            return evento.get();
+        }
+        return null;
+    }
 }

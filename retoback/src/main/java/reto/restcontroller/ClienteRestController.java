@@ -92,7 +92,7 @@ public class ClienteRestController {
             return ResponseEntity.badRequest().body("No hay suficientes plazas disponibles para este evento.");
         }
         String username = principal.getName();
-        List<Reserva> reservasCliente = reservaRepository.findByEventoAndUsuarioUsername(evento, username);
+        List<Reserva> reservasCliente = reservaRepository.findByEventoIdEventoAndUsuarioUsername(id, username);
         int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
         if (reservasPrevias >= 10) {
             return ResponseEntity.badRequest().body("Ya tienes una reserva de 10 plazas para este evento.");
