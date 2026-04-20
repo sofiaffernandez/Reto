@@ -52,7 +52,7 @@ public class SecurityConfig {
                 //.requestMatchers("/eventos/listado").permitAll()
                 .requestMatchers("/eventos", "/eventos/", "/eventos/detalle/**").permitAll()
                 .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados").permitAll()
-                .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**").hasRole("ADMON")
+                .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**", "/eventos/eliminar/**").hasRole("ADMON")
                 .requestMatchers("/usuarios/**").hasRole("ADMON")
                 .requestMatchers("/clientes/**").hasRole("CLIENTE")
                 .requestMatchers("/usuarios/crear", "/login").permitAll()

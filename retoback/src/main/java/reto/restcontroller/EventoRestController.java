@@ -161,14 +161,18 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
   }
 
 
-  // Otros endpoitns que creo que vamos a neceseitar 
-  //eventos/buscar filtros //busqueda
-  
-  //Crud de usuarios 
-
-  
-  
-
-
+  @DeleteMapping("/eliminar/{id}")
+  public ResponseEntity<?> eliminar(@PathVariable Long id) {
+    try {
+        Evento eventoEliminado = eventoService.deleteOne(id);
+        if (eventoEliminado != null) {
+            return ResponseEntity.ok(eventoEliminado);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
+        }
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al eliminar el evento");
+    }
+  }
 
 }

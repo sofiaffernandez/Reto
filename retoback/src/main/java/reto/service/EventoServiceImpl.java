@@ -92,4 +92,12 @@ public class EventoServiceImpl implements EventoService {
         return eventoRepository.findByEstado(estado);
     }
 
+    public Evento deleteOne(Long id) {
+        Evento evento = eventoRepository.findById(idEvento).orElse(null);
+        if (evento != null) {
+            eventoRepository.deleteById(id);
+            return evento.get();
+        }
+        return null;
+    }
 }

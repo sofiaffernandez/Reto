@@ -32,7 +32,7 @@ public interface EventoRepository extends JpaRepository<Evento, Integer> {
   @Query("SELECT e FROM Evento e WHERE e.destacado = 'S'")
   List<Evento> findDestacados();
 
-   List<Evento> findByEstado(String estado);
+  List<Evento> findByEstado(String estado);
 
   List<Evento> findByDestacadoAndEstado(String destacado, String estado);
 
