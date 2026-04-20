@@ -78,39 +78,43 @@ public class ClienteRestController {
         return ResponseEntity.ok(evento);
     }
 
-    @PostMapping("/reservar/{id}")
-    public ResponseEntity<String> reservarEvento(@PathVariable Integer id, @RequestParam int cantidad, Principal principal) {
-        if (cantidad < 1 || cantidad > 10) {
-            return ResponseEntity.badRequest().body("No se permite reservar más de 10 plazas por reserva.");
-        }
-        Evento evento = eventoService.findById(id);
-        if (evento == null) {
-            return ResponseEntity.badRequest().body("Evento no encontrado.");
-        }
-        int totalReservas = reservaRepository.findByEvento(evento).stream().mapToInt(Reserva::getCantidad).sum();
-        if (totalReservas + cantidad > evento.getAforoMaximo()) {
-            return ResponseEntity.badRequest().body("No hay suficientes plazas disponibles para este evento.");
-        }
-        String username = principal.getName();
-        List<Reserva> reservasCliente = reservaRepository.findByEventoIdEventoAndUsuarioUsername(id, username);
-        int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
-        if (reservasPrevias >= 10) {
-            return ResponseEntity.badRequest().body("Ya tienes una reserva de 10 plazas para este evento.");
-        }
-        if (reservasPrevias + cantidad > 10) {
-            return ResponseEntity.badRequest().body("No puedes superar 10 plazas reservadas en total para este evento.");
-        }
-        Usuario usuario = usuarioRepository.findById(username).orElse(null);
-        if (usuario == null) {
-            return ResponseEntity.badRequest().body("Usuario no encontrado.");
-        }
-        Reserva reserva = new Reserva();
-        reserva.setEvento(evento);
-        reserva.setUsuario(usuario);
-        reserva.setCantidad(cantidad);
-        reservaRepository.save(reserva);
-        return ResponseEntity.ok("Reserva realizada correctamente.");
-    }
+    /*
+     EN EL REST CONTROLLER SOLO VA LA LOGICA DE GET, POST, DELETE, PUT, PERO NUNCA LA LOGICA DE NEGOCIO, 
+    ESA VA EN EL SERVICIO
+     */
+    // @PostMapping("/reservar/{id}")
+    // public ResponseEntity<String> reservarEvento(@PathVariable Integer id, @RequestParam int cantidad, Principal principal) {
+    //     if (cantidad < 1 || cantidad > 10) {
+    //         return ResponseEntity.badRequest().body("No se permite reservar más de 10 plazas por reserva.");
+    //     }
+    //     Evento evento = eventoService.findById(id);
+    //     if (evento == null) {
+    //         return ResponseEntity.badRequest().body("Evento no encontrado.");
+    //     }
+    //     int totalReservas = reservaRepository.findByEvento(evento).stream().mapToInt(Reserva::getCantidad).sum();
+    //     if (totalReservas + cantidad > evento.getAforoMaximo()) {
+    //         return ResponseEntity.badRequest().body("No hay suficientes plazas disponibles para este evento.");
+    //     }
+    //     String username = principal.getName();
+    //     List<Reserva> reservasCliente = reservaRepository.findByEventoIdEventoAndUsuarioUsername(id, username);
+    //     int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
+    //     if (reservasPrevias >= 10) {
+    //         return ResponseEntity.badRequest().body("Ya tienes una reserva de 10 plazas para este evento.");
+    //     }
+    //     if (reservasPrevias + cantidad > 10) {
+    //         return ResponseEntity.badRequest().body("No puedes superar 10 plazas reservadas en total para este evento.");
+    //     }
+    //     Usuario usuario = usuarioRepository.findById(username).orElse(null);
+    //     if (usuario == null) {
+    //         return ResponseEntity.badRequest().body("Usuario no encontrado.");
+    //     }
+    //     Reserva reserva = new Reserva();
+    //     reserva.setEvento(evento);
+    //     reserva.setUsuario(usuario);
+    //     reserva.setCantidad(cantidad);
+    //     reservaRepository.save(reserva);
+    //     return ResponseEntity.ok("Reserva realizada correctamente.");
+    // }
 
     @GetMapping("/misReservas")
     public List<Reserva> getMisReservas(Principal principal) {

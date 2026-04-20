@@ -3,6 +3,7 @@ package reto.restcontroller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -162,16 +163,17 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
 
 
   @DeleteMapping("/eliminar/{id}")
-  public ResponseEntity<?> eliminar(@PathVariable Long id) {
-    try {
-        Evento eventoEliminado = eventoService.deleteOne(id);
-        if (eventoEliminado != null) {
-            return ResponseEntity.ok(eventoEliminado);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
-        }
-    } catch (Exception e) {
+  public ResponseEntity<?> eliminar(@PathVariable Integer id) {
+    Evento eventoEliminado = eventoService.findById(id);
+    if (eventoEliminado != null){
+      try{
+        eventoService.deleteOne(id);
+        return ResponseEntity.ok("Evento eliminado correctamente");
+      } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al eliminar el evento");
+      }
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
     }
   }
 

@@ -14,6 +14,8 @@ public interface  EventoService {
 
   ///eventos/editar/{id}
   Evento updateOne(Evento evento);
+  
+  void deleteOne(Integer idEvento);
 
   ///eventos/cancelar/{id}
   Evento cancelOne(Integer idEvento);
