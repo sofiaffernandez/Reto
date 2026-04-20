@@ -3,6 +3,7 @@ package reto.service;
 import java.util.List;
 
 import reto.entities.Evento;
+import reto.entities.Reserva;
 
 public interface  EventoService {
   
@@ -37,4 +38,8 @@ public interface  EventoService {
   List<Evento> findTerminados();
 
   List<Evento>findByEstado(String estado);
+
+  List<Reserva> findMisReservas(String username);
+  Reserva crearReserva(Integer idEvento, int cantidad, String username);
+  Reserva cancelarReserva(Integer idReserva, String username);
 }

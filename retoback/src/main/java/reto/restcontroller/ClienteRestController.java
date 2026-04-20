@@ -1,8 +1,6 @@
 package reto.restcontroller;
 
 import java.security.Principal;
-import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,9 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import reto.entities.Evento;
 import reto.entities.Reserva;
-import reto.entities.Usuario;
-import reto.repository.ReservaRepository;
-import reto.repository.UsuarioRepository;
 import reto.service.EventoService;
 
 
@@ -28,10 +23,6 @@ import reto.service.EventoService;
 public class ClienteRestController {
     @Autowired
     private EventoService eventoService;
-    @Autowired
-    private ReservaRepository reservaRepository;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
     @GetMapping("/activos")
     public ResponseEntity<?> activos () {
@@ -63,9 +54,9 @@ public class ClienteRestController {
     @GetMapping("/cancelados")
     public ResponseEntity<?> cancelados () {
       try {
-        return ResponseEntity.ok(eventoService.findActivos());
+        return ResponseEntity.ok(eventoService.findCancelados());
       } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos activos");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos cancelados");
       }
     }
 
@@ -78,61 +69,43 @@ public class ClienteRestController {
         return ResponseEntity.ok(evento);
     }
 
-    /*
-     EN EL REST CONTROLLER SOLO VA LA LOGICA DE GET, POST, DELETE, PUT, PERO NUNCA LA LOGICA DE NEGOCIO, 
-    ESA VA EN EL SERVICIO
-     */
-    // @PostMapping("/reservar/{id}")
-    // public ResponseEntity<String> reservarEvento(@PathVariable Integer id, @RequestParam int cantidad, Principal principal) {
-    //     if (cantidad < 1 || cantidad > 10) {
-    //         return ResponseEntity.badRequest().body("No se permite reservar más de 10 plazas por reserva.");
-    //     }
-    //     Evento evento = eventoService.findById(id);
-    //     if (evento == null) {
-    //         return ResponseEntity.badRequest().body("Evento no encontrado.");
-    //     }
-    //     int totalReservas = reservaRepository.findByEvento(evento).stream().mapToInt(Reserva::getCantidad).sum();
-    //     if (totalReservas + cantidad > evento.getAforoMaximo()) {
-    //         return ResponseEntity.badRequest().body("No hay suficientes plazas disponibles para este evento.");
-    //     }
-    //     String username = principal.getName();
-    //     List<Reserva> reservasCliente = reservaRepository.findByEventoIdEventoAndUsuarioUsername(id, username);
-    //     int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
-    //     if (reservasPrevias >= 10) {
-    //         return ResponseEntity.badRequest().body("Ya tienes una reserva de 10 plazas para este evento.");
-    //     }
-    //     if (reservasPrevias + cantidad > 10) {
-    //         return ResponseEntity.badRequest().body("No puedes superar 10 plazas reservadas en total para este evento.");
-    //     }
-    //     Usuario usuario = usuarioRepository.findById(username).orElse(null);
-    //     if (usuario == null) {
-    //         return ResponseEntity.badRequest().body("Usuario no encontrado.");
-    //     }
-    //     Reserva reserva = new Reserva();
-    //     reserva.setEvento(evento);
-    //     reserva.setUsuario(usuario);
-    //     reserva.setCantidad(cantidad);
-    //     reservaRepository.save(reserva);
-    //     return ResponseEntity.ok("Reserva realizada correctamente.");
-    // }
+
+    @PostMapping("/reservar/{id}")
+    public ResponseEntity<String> reservarEvento(@PathVariable Integer id,
+                            @RequestParam int cantidad,
+                            Principal principal) {
+      try {
+        eventoService.crearReserva(id, cantidad, principal.getName());
+        return ResponseEntity.ok("Reserva realizada correctamente.");
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+      } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error al realizar la reserva.");
+      }
+    }
 
     @GetMapping("/misReservas")
-    public List<Reserva> getMisReservas(Principal principal) {
-        String username = principal.getName();
-        LocalDate hoy = LocalDate.now();
-        return reservaRepository.findByUsuarioUsernameAndEventoFechaInicioAfter(username, hoy);
+    public ResponseEntity<?> getMisReservas(Principal principal) {
+      try {
+        return ResponseEntity.ok(eventoService.findMisReservas(principal.getName()));
+      } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener tus reservas");
+      }
     }
 
     @DeleteMapping("/cancelar/{id}")
     public ResponseEntity<String> cancelarReserva(@PathVariable Integer id, Principal principal) {
-        Reserva reserva = reservaRepository.findById(id).orElse(null);
-        if (reserva == null) {
-            return ResponseEntity.notFound().build();
+      try {
+        Reserva reserva = eventoService.cancelarReserva(id, principal.getName());
+        return ResponseEntity.ok("Reserva cancelada correctamente. ID: " + reserva.getIdReserva());
+      } catch (IllegalArgumentException e) {
+        if ("Reserva no encontrada.".equals(e.getMessage())) {
+          return ResponseEntity.notFound().build();
         }
-        if (!reserva.getUsuario().getUsername().equals(principal.getName())) {
-            return ResponseEntity.status(403).body("No puedes cancelar reservas de otros usuarios.");
-        }
-        reservaRepository.deleteById(id);
-        return ResponseEntity.ok("Reserva cancelada correctamente.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+      } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al cancelar la reserva.");
+      }
     }
 }

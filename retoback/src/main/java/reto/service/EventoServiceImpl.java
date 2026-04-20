@@ -1,19 +1,30 @@
 package reto.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 import reto.entities.Evento;
 import reto.repository.EventoRepository;
+import reto.entities.Reserva;
+import reto.entities.Usuario;
+import reto.repository.ReservaRepository;
+import reto.repository.UsuarioRepository;
 
 @Service
 public class EventoServiceImpl implements EventoService {
     @Autowired
     private EventoRepository eventoRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Override
     public Evento findById(Integer idEvento) {
@@ -90,6 +101,7 @@ public class EventoServiceImpl implements EventoService {
         return eventoRepository.findByEstado(estado);
     }
 
+    @Override
     public void deleteOne(Integer id) {
         Evento evento = eventoRepository.findById(id).orElse(null);
         if (evento != null) {
@@ -97,5 +109,65 @@ public class EventoServiceImpl implements EventoService {
            
         }
         
+    }
+
+    @Override
+    public Reserva crearReserva(Integer idEvento, int cantidad, String username) {
+        if (cantidad < 1 || cantidad > 10) {
+            throw new IllegalArgumentException("No se permite reservar más de 10 plazas por reserva.");
+        }
+
+        Evento evento = eventoRepository.findById(Objects.requireNonNull(idEvento, "idEvento"))
+                .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado."));
+
+        Usuario usuario = usuarioRepository.findById(Objects.requireNonNull(username, "username"))
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
+
+        int totalReservas = reservaRepository.findByEvento(evento)
+                .stream()
+                .mapToInt(Reserva::getCantidad)
+                .sum();
+        if (totalReservas + cantidad > evento.getAforoMaximo()) {
+            throw new IllegalArgumentException("No hay suficientes plazas disponibles.");
+        }
+
+        List<Reserva> reservasCliente = reservaRepository
+                .findByEventoIdEventoAndUsuarioUsername(idEvento, username);
+        int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
+        if (reservasPrevias >= 10) {
+            throw new IllegalArgumentException("Ya tienes 10 plazas reservadas para este evento.");
+        }
+        if (reservasPrevias + cantidad > 10) {
+            throw new IllegalArgumentException("No puedes superar 10 plazas en total para este evento.");
+        }
+
+        BigDecimal precioVenta = evento.getPrecio().multiply(BigDecimal.valueOf(cantidad));
+
+        Reserva reserva = Reserva.builder()
+                .evento(evento)
+                .usuario(usuario)
+                .cantidad(cantidad)
+                .precioVenta(precioVenta)
+                .build();
+
+        return reservaRepository.save(reserva);
+    }
+
+    @Override
+    public List<Reserva> findMisReservas(String username) {
+        return reservaRepository.findByUsuarioUsernameAndEventoFechaInicioAfter(username, LocalDate.now());
+    }
+
+    @Override
+    public Reserva cancelarReserva(Integer idReserva, String username) {
+        Reserva reserva = reservaRepository.findById(Objects.requireNonNull(idReserva, "idReserva"))
+                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada."));
+
+        if (!reserva.getUsuario().getUsername().equals(username)) {
+            throw new IllegalArgumentException("No puedes cancelar reservas de otros usuarios.");
+        }
+
+        reservaRepository.delete(reserva);
+        return reserva;
     }
 }
