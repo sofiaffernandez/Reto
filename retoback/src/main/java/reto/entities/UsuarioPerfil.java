@@ -1,9 +1,8 @@
 package reto.entities;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,19 +17,19 @@ import lombok.NoArgsConstructor;
     name = "usuario_perfiles",
     uniqueConstraints = @UniqueConstraint(columnNames = {"username", "id_perfil"})
 )
+@IdClass(UsuarioPerfilId.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UsuarioPerfil {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)
     private Usuario usuario;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "id_perfil", nullable = false)
     private Perfil perfil;

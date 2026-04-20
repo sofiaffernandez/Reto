@@ -36,7 +36,7 @@ public class Reserva {
     @JoinColumn(name = "username", nullable = false)
     private Usuario usuario;
 
-    @Column(name = "precio_venta", precision = 9, scale = 2)
+    @Column(name = "precio_venta", precision = 9, scale = 2, nullable = false)
     private BigDecimal precioVenta;
 
     @Column(length = 200)

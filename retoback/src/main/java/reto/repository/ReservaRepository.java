@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import reto.entities.Evento;
 import reto.entities.Reserva;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {

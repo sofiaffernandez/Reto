@@ -87,7 +87,7 @@ public class ClienteRestController {
         if (evento == null) {
             return ResponseEntity.badRequest().body("Evento no encontrado.");
         }
-        int totalReservas = reservaRepository.findById(id).stream().mapToInt(Reserva::getCantidad).sum();
+        int totalReservas = reservaRepository.findByEvento(evento).stream().mapToInt(Reserva::getCantidad).sum();
         if (totalReservas + cantidad > evento.getAforoMaximo()) {
             return ResponseEntity.badRequest().body("No hay suficientes plazas disponibles para este evento.");
         }
