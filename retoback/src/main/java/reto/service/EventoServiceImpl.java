@@ -67,7 +67,7 @@ public class EventoServiceImpl implements EventoService {
 
     @Override
     public List<Evento> findByTipo(String tipo) {
-        return eventoRepository.findByTipoNombre(tipo);
+        return eventoRepository.findByTipo(tipo);
     }
 
     @Override
@@ -90,12 +90,12 @@ public class EventoServiceImpl implements EventoService {
         return eventoRepository.findByEstado(estado);
     }
 
-    public Evento deleteOne(Long id) {
-        Evento evento = eventoRepository.findById(idEvento).orElse(null);
+    public void deleteOne(Integer id) {
+        Evento evento = eventoRepository.findById(id).orElse(null);
         if (evento != null) {
             eventoRepository.deleteById(id);
-            return evento.get();
+           
         }
-        return null;
+        
     }
 }

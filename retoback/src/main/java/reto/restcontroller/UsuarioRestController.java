@@ -36,33 +36,64 @@ public class UsuarioRestController {
     @Autowired
     private UsuarioService usuarioService;
 
-    //usuarios/alta -> crear usuario
+    /*
+     * HAY QUE REVISRALO PORQUE SIEMPRE CREA EL USUARIO
+     * PRIMERO HAY QUE VER IS EL USUARIO EXISTE EN LA BBDD
+     * SI EXISTE, DEVOLVER UN ERROR
+     * SI NO EXISTE, CREAR EL USUARIO Y ASIGNARLE EL ROL DE CLIENTE Y LE ENCRIPTAMOS
+     * LA CONTRASEÑA
+     * 
+     */
+
     @PostMapping("/alta")
     public ResponseEntity<?> alta(@RequestBody Usuario usuario) {
+        Perfil perfilCliente = perfilRepository.findByNombre("ROLE_CLIENTE");
+        if (perfilCliente == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Perfil CLIENTE no existe");
+        }
+
         try {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-            Usuario nuevoUsuario = usuarioService.createOne(usuario);
-            if (nuevoUsuario != null) {
-                // Asignar perfil CLIENTE (esto lo pongo automático, me imagino que debe ser asi, podemos revisar)
-                Perfil perfilCliente = perfilRepository.findByNombre("CLIENTE");
-                if (perfilCliente == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Perfil CLIENTE no existe");
-                }
-                UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
-                        .usuario(nuevoUsuario)
-                        .perfil(perfilCliente)
-                        .build();
-                usuarioPerfilRepository.save(usuarioPerfil);
-                return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya existe");
-            }
+            Usuario nuevoUsuario = usuarioService.createUsuarioConPerfil(usuario, perfilCliente);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el usuario");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el usuario");
         }
     }
 
-    //usuarios/detalle/{username}
+    // usuarios/alta -> crear usuario
+    // @PostMapping("/alta")
+    // public ResponseEntity<?> alta(@RequestBody Usuario usuario) {
+    // System.out.println("Recibido usuario: " + usuario);
+    // try {
+    // usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+    // Usuario nuevoUsuario = usuarioService.createOne(usuario);
+    // if (nuevoUsuario != null) {
+    // // Asignar perfil CLIENTE (esto lo pongo automático, me imagino que debe ser
+    // asi, podemos revisar)
+    // Perfil perfilCliente = perfilRepository.findByNombre("CLIENTE");
+    // if (perfilCliente == null) {
+    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Perfil CLIENTE no
+    // existe");
+    // }
+    // UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
+    // .usuario(nuevoUsuario)
+    // .perfil(perfilCliente)
+    // .build();
+    // usuarioPerfilRepository.save(usuarioPerfil);
+    // return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
+    // } else {
+    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya
+    // existe");
+    // }
+    // } catch (Exception e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al
+    // crear el usuario");
+    // }
+    // }
+
+    // usuarios/detalle/{username}
     @GetMapping("/detalle/{username}")
     public ResponseEntity<?> detalle(@PathVariable String username) {
         try {
@@ -77,7 +108,7 @@ public class UsuarioRestController {
         }
     }
 
-    //usuarios/editar
+    // usuarios/editar
     @PutMapping("/editar")
     public ResponseEntity<?> editar(@RequestBody Usuario usuario) {
         try {
@@ -92,7 +123,7 @@ public class UsuarioRestController {
         }
     }
 
-    //usuarios/eliminar/{username}
+    // usuarios/eliminar/{username}
     @DeleteMapping("/eliminar/{username}")
     public ResponseEntity<?> eliminar(@PathVariable String username) {
         try {
@@ -107,10 +138,10 @@ public class UsuarioRestController {
         }
     }
 
-    //usuarios/rol/{username}?nuevoRol=ROLE_ADMON
+    // usuarios/rol/{username}?nuevoRol=ROLE_ADMON
     @PutMapping("/rol/{username}")
     public ResponseEntity<?> cambiarRol(@PathVariable String username,
-                                         @RequestParam String nuevoRol) {
+            @RequestParam String nuevoRol) {
         try {
             usuarioService.updateUserRole(username, nuevoRol);
             return ResponseEntity.ok("Rol actualizado correctamente");

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import reto.entities.Perfil;
 import reto.entities.Usuario;
 import reto.entities.UsuarioPerfil;
@@ -26,20 +27,20 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
-  
+
   // CREATE Usuario createOne(Usuario usuario);
   @Override
   public Usuario createOne(Usuario usuario) {
     usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
     return usuarioRepository.save(usuario);
   }
-  
+
   // READ Usuario findByUsername(String username);
   @Override
   public Usuario findByUsername(String username) {
     return usuarioRepository.findById(username).orElse(null);
   }
-  
+
   // UPDATE Usuario updateOne(Usuario usuario);
   @Override
   public Usuario updateOne(Usuario usuario) {
@@ -65,14 +66,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
     return null;
   }
-  
+
   @Override
   public List<String> getRolesUsuario(Usuario usuario) {
     // Busca los perfiles asociados al usuario y devuelve los nombres de los roles
     return usuarioPerfilRepository.findByUsuario(usuario)
-            .stream()
-            .map(up -> up.getPerfil().getNombre())
-            .collect(Collectors.toList());
+        .stream()
+        .map(up -> up.getPerfil().getNombre())
+        .collect(Collectors.toList());
   }
 
   // UPDATE ROOOL Usuario updateRole(String username, String nuevoRol);
@@ -97,6 +98,26 @@ public class UsuarioServiceImpl implements UsuarioService {
         .build();
 
     usuarioPerfilRepository.save(usuarioPerfil);
+  }
+
+  @Transactional
+  @Override
+  public Usuario createUsuarioConPerfil(Usuario usuario, Perfil perfil) {
+    // Comprobar duplicado por username
+    if (usuarioRepository.existsById(usuario.getUsername())) {
+      throw new IllegalArgumentException("El usuario ya existe");
+    }
+
+    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+    Usuario saved = usuarioRepository.save(usuario);
+
+    usuarioPerfilRepository.save(
+        UsuarioPerfil.builder()
+            .usuario(saved)
+            .perfil(perfil)
+            .build());
+
+    return saved;
   }
 
 }

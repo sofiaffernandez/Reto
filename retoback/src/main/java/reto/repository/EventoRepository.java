@@ -20,7 +20,7 @@ public interface EventoRepository extends JpaRepository<Evento, Integer> {
 
   List<Evento> findByDestacadoAndEstado(String destacado, String estado);
 
-  List<Evento> findByEstado(String estado);
+  // List<Evento> findByEstado(String estado);
 
   List<Evento> findByDestacado(String destacado);
 
