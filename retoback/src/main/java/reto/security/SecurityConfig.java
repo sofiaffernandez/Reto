@@ -50,7 +50,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 //.requestMatchers("/eventos/listado").permitAll()
-                .requestMatchers("/usuarios/alta", "/login").permitAll()
+                .requestMatchers("/usuarios/alta", "/usuarios/login", "/login").permitAll()
                 .requestMatchers("/eventos", "/eventos/", "/eventos/detalle/**").permitAll()
                 .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados").permitAll()
                 .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**", "/eventos/eliminar/**").hasRole("ADMON")

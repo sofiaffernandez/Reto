@@ -3,7 +3,7 @@ package reto.restcontroller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import reto.entities.Perfil;
 import reto.entities.Usuario;
-import reto.entities.UsuarioPerfil;
 import reto.repository.PerfilRepository;
-import reto.repository.UsuarioPerfilRepository;
 import reto.service.UsuarioService;
 
 @RestController
@@ -29,12 +27,10 @@ public class UsuarioRestController {
     private PerfilRepository perfilRepository;
 
     @Autowired
-    private UsuarioPerfilRepository usuarioPerfilRepository;
-
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private UsuarioService usuarioService;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private PasswordEncoder passwordEncoder;
 
     /*
      * HAY QUE REVISRALO PORQUE SIEMPRE CREA EL USUARIO
@@ -59,6 +55,29 @@ public class UsuarioRestController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el usuario");
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Usuario usuarioLogin) {
+        try {
+            if (usuarioLogin.getUsername() == null || usuarioLogin.getPassword() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username y password son obligatorios");
+            }
+
+            Usuario usuario = usuarioService.findByUsername(usuarioLogin.getUsername());
+            if (usuario == null || usuario.getEnabled() == null || usuario.getEnabled() != 1) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+            }
+
+            boolean passwordCorrecta = passwordEncoder.matches(usuarioLogin.getPassword(), usuario.getPassword());
+            if (!passwordCorrecta) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+            }
+
+            return ResponseEntity.ok("Login correcto");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en el login");
         }
     }
 

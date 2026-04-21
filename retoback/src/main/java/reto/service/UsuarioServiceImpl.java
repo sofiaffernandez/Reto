@@ -1,5 +1,6 @@
 package reto.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,18 @@ public class UsuarioServiceImpl implements UsuarioService {
   // CREATE Usuario createOne(Usuario usuario);
   @Override
   public Usuario createOne(Usuario usuario) {
+    if (usuarioRepository.existsById(usuario.getUsername())) {
+      throw new IllegalArgumentException("El usuario ya existe");
+    }
+    if (usuarioRepository.existsByEmailIgnoreCase(usuario.getEmail())) {
+      throw new IllegalArgumentException("El email ya existe");
+    }
+    if (usuario.getEnabled() == null) {
+      usuario.setEnabled(1);
+    }
+    if (usuario.getFechaRegistro() == null) {
+      usuario.setFechaRegistro(LocalDate.now());
+    }
     usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
     return usuarioRepository.save(usuario);
   }
@@ -107,7 +120,16 @@ public class UsuarioServiceImpl implements UsuarioService {
     if (usuarioRepository.existsById(usuario.getUsername())) {
       throw new IllegalArgumentException("El usuario ya existe");
     }
+    if (usuarioRepository.existsByEmailIgnoreCase(usuario.getEmail())) {
+      throw new IllegalArgumentException("El email ya existe");
+    }
 
+    if (usuario.getEnabled() == null) {
+      usuario.setEnabled(1);
+    }
+    if (usuario.getFechaRegistro() == null) {
+      usuario.setFechaRegistro(LocalDate.now());
+    }
     usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
     Usuario saved = usuarioRepository.save(usuario);
 

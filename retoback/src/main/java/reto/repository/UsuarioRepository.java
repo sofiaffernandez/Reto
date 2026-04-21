@@ -6,5 +6,6 @@ import reto.entities.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     Usuario findByUsername(String username);
+    boolean existsByEmailIgnoreCase(String email);
     
 }
