@@ -48,7 +48,7 @@ public class SecurityConfig {
                 //.requestMatchers("/eventos/listado").permitAll()
                 .requestMatchers("/usuarios/alta", "/login").permitAll()
                 .requestMatchers("/eventos", "/eventos/listado", "/eventos/detalle/**").permitAll()
-                .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados").permitAll()
+                .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados", "/eventos/terminados").permitAll()
                 .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**", "/eventos/eliminar/**").hasRole("ADMON")
                 .requestMatchers("/usuarios/**").hasRole("ADMON")
                 .requestMatchers("/clientes/**").hasRole("CLIENTE")

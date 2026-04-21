@@ -151,6 +151,16 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
+  //eventos/terminados
+  @GetMapping("/terminados")  
+  public ResponseEntity<?> terminados () {
+    try {
+      return ResponseEntity.ok(eventoService.findTerminados());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos terminados");
+    }
+  }
+
   //eventos/tipo/{tipo}
   @GetMapping("/tipo/{tipo}")
   public ResponseEntity<?> tipo (@PathVariable String tipo) {
