@@ -3,6 +3,8 @@ package reto.entities;
 import java.time.LocalDate; 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,7 +13,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "usuarios")
@@ -19,6 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"perfiles", "reservas"})
+@EqualsAndHashCode(exclude = {"perfiles", "reservas"})
 public class Usuario {
     @Id
     @Column(length = 45)
@@ -46,9 +52,15 @@ public class Usuario {
     private LocalDate fechaRegistro;
 
     @OneToMany(mappedBy = "usuario")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("usuario")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<UsuarioPerfil> perfiles;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Reserva> reservas;
 
 }

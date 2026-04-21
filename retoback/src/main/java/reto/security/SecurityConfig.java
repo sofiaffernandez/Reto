@@ -31,12 +31,8 @@ public class SecurityConfig {
     }
     
     
-     PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  
-    }
-   
-
-
+    // El PasswordEncoder ya está definido en PasswordEncoderConfig.java
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -51,7 +47,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 //.requestMatchers("/eventos/listado").permitAll()
                 .requestMatchers("/usuarios/alta", "/login").permitAll()
-                .requestMatchers("/eventos", "/eventos/", "/eventos/detalle/**").permitAll()
+                .requestMatchers("/eventos", "/eventos/listado", "/eventos/detalle/**").permitAll()
                 .requestMatchers("/eventos/destacados", "/eventos/activos", "/eventos/cancelados").permitAll()
                 .requestMatchers("/eventos/alta", "/eventos/editar/**", "/eventos/cancelar/**", "/eventos/eliminar/**").hasRole("ADMON")
                 .requestMatchers("/usuarios/**").hasRole("ADMON")

@@ -12,7 +12,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "perfiles")
@@ -20,6 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "usuarios")
+@EqualsAndHashCode(exclude = "usuarios")
 public class Perfil {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

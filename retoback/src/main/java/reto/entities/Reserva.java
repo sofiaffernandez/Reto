@@ -2,6 +2,8 @@ package reto.entities;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @Table(name = "reservas")
@@ -34,15 +35,12 @@ public class Reserva {
 
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
 
     @Column(name = "precio_venta", precision = 9, scale = 2, nullable = false)
     private BigDecimal precioVenta;
 
-    @Column(length = 200)
-    private String observaciones;
-
-    @Column(nullable = false)
-    private Integer cantidad;
-
+    @Column(name = "cantidad", nullable = false)
+    private int cantidad;
 }

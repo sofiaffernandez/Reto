@@ -38,7 +38,8 @@ public class UsuarioServiceImpl implements UsuarioService {
   // READ Usuario findByUsername(String username);
   @Override
   public Usuario findByUsername(String username) {
-    return usuarioRepository.findById(username).orElse(null);
+    // Usamos el nuevo método de consulta atómica para traer usuario y perfiles juntos
+    return usuarioRepository.findByUsernameWithPerfiles(username);
   }
 
   // UPDATE Usuario updateOne(Usuario usuario);

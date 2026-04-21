@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import reto.dto.ReservaDTO;
 import reto.entities.Evento;
 import reto.repository.EventoRepository;
 import reto.entities.Reserva;
@@ -154,8 +156,30 @@ public class EventoServiceImpl implements EventoService {
     }
 
     @Override
-    public List<Reserva> findMisReservas(String username) {
-        return reservaRepository.findByUsuarioUsernameAndEventoFechaInicioAfter(username, LocalDate.now());
+    public List<ReservaDTO> findMisReservas(String username) {
+        // Desactivamos temporalmente el filtro de fecha para depuración
+        List<Reserva> reservas = reservaRepository.findByUsuarioUsername(username);
+        return reservas.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReservaDTO> findMisReservasTodas(String username) {
+        List<Reserva> reservas = reservaRepository.findByUsuarioUsername(username);
+        return reservas.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    private ReservaDTO toDTO(Reserva r) {
+        return ReservaDTO.builder()
+                .idReserva(r.getIdReserva())
+                .nombreEvento(r.getEvento().getNombre())
+                .fechaEvento(r.getEvento().getFechaInicio())
+                .cantidad(r.getCantidad())
+                .precioVenta(r.getPrecioVenta())
+                .build();
     }
 
     @Override

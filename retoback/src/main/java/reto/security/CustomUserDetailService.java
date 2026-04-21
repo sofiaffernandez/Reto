@@ -32,8 +32,9 @@ public UserDetails loadUserByUsername(String username) throws UsernameNotFoundEx
 
     // System.out.println("Password en BD: " + usuario.getPassword()); // ← añade esto
 
-    String[] roles = usuarioService.getRolesUsuario(usuario)
-        .stream()
+    // Extraemos los roles directamente del objeto usuario (que ya los trae gracias al JOIN FETCH)
+    String[] roles = usuario.getPerfiles().stream()
+        .map(up -> up.getPerfil().getNombre())
         .toArray(String[]::new);
 
     return User.builder()

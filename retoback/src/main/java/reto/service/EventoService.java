@@ -2,6 +2,7 @@ package reto.service;
 
 import java.util.List;
 
+import reto.dto.ReservaDTO;
 import reto.entities.Evento;
 import reto.entities.Reserva;
 
@@ -39,7 +40,8 @@ public interface  EventoService {
 
   List<Evento>findByEstado(String estado);
 
-  List<Reserva> findMisReservas(String username);
+  List<ReservaDTO> findMisReservas(String username);
+  List<ReservaDTO> findMisReservasTodas(String username);
   Reserva crearReserva(Integer idEvento, int cantidad, String username);
   Reserva cancelarReserva(Integer idReserva, String username);
 }
