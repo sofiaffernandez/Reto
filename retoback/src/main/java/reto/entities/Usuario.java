@@ -53,14 +53,10 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     @com.fasterxml.jackson.annotation.JsonIgnoreProperties("usuario")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<UsuarioPerfil> perfiles;
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<Reserva> reservas;
 
 }
