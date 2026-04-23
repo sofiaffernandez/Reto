@@ -38,7 +38,7 @@ public class TipoRestController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tipo no encontrado");
       }
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el tipo");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el tipo ");
     }
   }
 
