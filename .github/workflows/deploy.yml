@@ -2,7 +2,7 @@ name: Deploy Back
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feat/deploy ]
 
 jobs:
   deploy:
@@ -20,6 +20,7 @@ jobs:
 
       - name: Build con Maven
         run: mvn clean package -DskipTests
+        working-directory: retoback
 
       - name: Subir .jar al VPS
         uses: appleboy/scp-action@v0.1.7
@@ -27,9 +28,9 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "target/*.jar"
+          source: "retoback/target/*.jar"
           target: "/opt/retoback/"
-          strip_components: 1
+          strip_components: 2
 
       - name: Renombrar y reiniciar servicio
         uses: appleboy/ssh-action@v1.0.3
