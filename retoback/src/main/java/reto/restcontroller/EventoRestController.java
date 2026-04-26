@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController; 
+import org.springframework.web.bind.annotation.RestController;
 
 import reto.dto.EventoDto;
 import reto.entities.Evento;
@@ -23,39 +23,10 @@ public class EventoRestController {
   @Autowired
   private EventoService eventoService;
 
-  //eventos/alta: crear un nuevo evento
+  // eventos/alta: crear un nuevo evento
   @PostMapping("/alta")
-  public ResponseEntity<?> alta (@RequestBody EventoDto eventoDto) {
-      Evento evento = new Evento();
-      evento.setNombre(eventoDto.getNombre());
-      evento.setDescripcion(eventoDto.getDescripcion());
-      evento.setFechaInicio(eventoDto.getFechaInicio());
-      evento.setDuracion(eventoDto.getDuracion());
-      evento.setDireccion(eventoDto.getDireccion());
-      evento.setEstado(eventoDto.getEstado());
-      evento.setDestacado(eventoDto.getDestacado());
-      evento.setAforoMaximo(eventoDto.getAforoMaximo());
-      evento.setMinimoAsistencia(eventoDto.getMinimoAsistencia());
-      evento.setPrecio(eventoDto.getPrecio());
-      Tipos tipo = new Tipos();
-      tipo.setIdTipo(eventoDto.getIdTipo());
-      evento.setTipo(tipo);
-
-    try {
-      Evento nuevoEvento = eventoService.insertOne(evento);
-      return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEvento);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el evento");
-    }
-  }
-  
-
-  ///eventos/editar/{id}
-@PutMapping("/editar/{id}")
-public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDto eventoDto) {
-  try {
+  public ResponseEntity<?> alta(@RequestBody EventoDto eventoDto) {
     Evento evento = new Evento();
-    evento.setIdEvento(id);
     evento.setNombre(eventoDto.getNombre());
     evento.setDescripcion(eventoDto.getDescripcion());
     evento.setFechaInicio(eventoDto.getFechaInicio());
@@ -70,20 +41,48 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     tipo.setIdTipo(eventoDto.getIdTipo());
     evento.setTipo(tipo);
 
-    Evento updateEvento = eventoService.updateOne(evento);
-    if (updateEvento != null) {
-      return ResponseEntity.ok(updateEvento);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
+    try {
+      Evento nuevoEvento = eventoService.insertOne(evento);
+      return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEvento);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el evento");
     }
-  } catch (Exception e) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar el evento");
   }
-}
 
-  ///eventos/cancelar/{id}
+  /// eventos/editar/{id}
+  @PutMapping("/editar/{id}")
+  public ResponseEntity<?> editar(@PathVariable Integer id, @RequestBody EventoDto eventoDto) {
+    try {
+      Evento evento = new Evento();
+      evento.setIdEvento(id);
+      evento.setNombre(eventoDto.getNombre());
+      evento.setDescripcion(eventoDto.getDescripcion());
+      evento.setFechaInicio(eventoDto.getFechaInicio());
+      evento.setDuracion(eventoDto.getDuracion());
+      evento.setDireccion(eventoDto.getDireccion());
+      evento.setEstado(eventoDto.getEstado());
+      evento.setDestacado(eventoDto.getDestacado());
+      evento.setAforoMaximo(eventoDto.getAforoMaximo());
+      evento.setMinimoAsistencia(eventoDto.getMinimoAsistencia());
+      evento.setPrecio(eventoDto.getPrecio());
+      Tipos tipo = new Tipos();
+      tipo.setIdTipo(eventoDto.getIdTipo());
+      evento.setTipo(tipo);
+
+      Evento updateEvento = eventoService.updateOne(evento);
+      if (updateEvento != null) {
+        return ResponseEntity.ok(updateEvento);
+      } else {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
+      }
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar el evento");
+    }
+  }
+
+  /// eventos/cancelar/{id}
   @PutMapping("/cancelar/{id}")
-  public ResponseEntity<?> cancelar (@PathVariable Integer id) {
+  public ResponseEntity<?> cancelar(@PathVariable Integer id) {
     try {
       Evento cancelEvento = eventoService.cancelOne(id);
       if (cancelEvento != null) {
@@ -96,9 +95,9 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/detalle/{id} 
+  // eventos/detalle/{id}
   @GetMapping("/detalle/{id}")
-  public ResponseEntity<?> detalle (@PathVariable Integer id) {
+  public ResponseEntity<?> detalle(@PathVariable Integer id) {
     try {
       Evento evento = eventoService.findById(id);
       if (evento != null) {
@@ -111,9 +110,9 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/listado
+  // eventos/listado
   @GetMapping("/listado")
-  public ResponseEntity<?> listado () {
+  public ResponseEntity<?> listado() {
     try {
       return ResponseEntity.ok(eventoService.findAll());
     } catch (Exception e) {
@@ -121,19 +120,19 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/destacados
+  // eventos/destacados
   @GetMapping("/destacados")
-  public ResponseEntity<?> destacados () {
+  public ResponseEntity<?> destacados() {
     try {
       return ResponseEntity.ok(eventoService.findDestacados());
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener el listado de eventos destacados");
     }
   }
-  
-  //eventos/activos
+
+  // eventos/activos
   @GetMapping("/activos")
-  public ResponseEntity<?> activos () {
+  public ResponseEntity<?> activos() {
     try {
       return ResponseEntity.ok(eventoService.findActivos());
     } catch (Exception e) {
@@ -141,9 +140,9 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/cancelados
-  @GetMapping("/cancelados")  
-  public ResponseEntity<?> cancelados () {
+  // eventos/cancelados
+  @GetMapping("/cancelados")
+  public ResponseEntity<?> cancelados() {
     try {
       return ResponseEntity.ok(eventoService.findCancelados());
     } catch (Exception e) {
@@ -151,9 +150,9 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/terminados
-  @GetMapping("/terminados")  
-  public ResponseEntity<?> terminados () {
+  // eventos/terminados
+  @GetMapping("/terminados")
+  public ResponseEntity<?> terminados() {
     try {
       return ResponseEntity.ok(eventoService.findTerminados());
     } catch (Exception e) {
@@ -161,9 +160,9 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-  //eventos/tipo/{tipo}
+  // eventos/tipo/{tipo}
   @GetMapping("/tipo/{tipo}")
-  public ResponseEntity<?> tipo (@PathVariable String tipo) {
+  public ResponseEntity<?> tipo(@PathVariable String tipo) {
     try {
       return ResponseEntity.ok(eventoService.findByTipo(tipo));
     } catch (Exception e) {
@@ -171,19 +170,17 @@ public ResponseEntity<?> editar (@PathVariable Integer id, @RequestBody EventoDt
     }
   }
 
-
   @DeleteMapping("/eliminar/{id}")
-  public ResponseEntity<?> eliminar(@PathVariable Integer id) {
+  public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
     Evento eventoEliminado = eventoService.findById(id);
-    if (eventoEliminado != null){
-      try{
-        eventoService.deleteOne(id);
-        return ResponseEntity.ok("Evento eliminado correctamente");
-      } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al eliminar el evento");
-      }
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
+    if (eventoEliminado == null) {
+      return ResponseEntity.notFound().build();
+    }
+    try {
+      eventoService.deleteOne(id);
+      return ResponseEntity.noContent().build(); // 204, sin body
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
