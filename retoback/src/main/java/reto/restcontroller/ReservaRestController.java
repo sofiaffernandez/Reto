@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import reto.dto.ReservaDTO;
+import reto.entities.Reserva;
 import reto.service.ReservaService;
 
 @RestController
@@ -56,19 +57,9 @@ public class ReservaRestController {
     }
 
     // DELETE /reservas/cancelar/{idReserva}
-    @DeleteMapping("/cancelar/{idReserva}")
-    public ResponseEntity<?> cancelar(
-            @PathVariable Integer idReserva,
-            Principal principal) {
-        try {
-            String username = principal.getName();
-            reservaService.cancelarReserva(idReserva, username);
-            return ResponseEntity.ok("Reserva cancelada correctamente.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al cancelar la reserva.");
-        }
+    @DeleteMapping("/cancelar/{id}")
+    public ResponseEntity<Reserva> cancelarReserva(@PathVariable Integer id, Principal principal) {
+        Reserva reserva = reservaService.cancelarReserva(id, principal.getName());
+        return ResponseEntity.ok(reserva);
     }
 }

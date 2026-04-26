@@ -30,19 +30,17 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public Reserva crearReserva(Integer idEvento, int cantidad, String username) {
-        // Validar cantidad
         if (cantidad < 1 || cantidad > 10) {
             throw new IllegalArgumentException("La cantidad debe estar entre 1 y 10.");
         }
 
-        // Obtener evento y usuario
         Evento evento = eventoRepository.findById(Objects.requireNonNull(idEvento))
                 .orElseThrow(() -> new IllegalArgumentException("Evento no encontrado."));
 
         Usuario usuario = usuarioRepository.findById(Objects.requireNonNull(username))
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
 
-        // Comprobar plazas disponibles
+        // Comprobar plazas disponibles globales
         int totalReservado = reservaRepository.findByEvento(evento)
                 .stream()
                 .mapToInt(Reserva::getCantidad)
@@ -52,9 +50,10 @@ public class ReservaServiceImpl implements ReservaService {
             throw new IllegalArgumentException("No hay suficientes plazas disponibles.");
         }
 
-        // Comprobar límite por usuario (máx 10 plazas por evento)
+        // Buscar reserva existente del usuario para este evento
         List<Reserva> reservasCliente = reservaRepository
                 .findByEventoIdEventoAndUsuarioUsername(idEvento, username);
+
         int reservasPrevias = reservasCliente.stream().mapToInt(Reserva::getCantidad).sum();
 
         if (reservasPrevias >= 10) {
@@ -64,10 +63,21 @@ public class ReservaServiceImpl implements ReservaService {
             throw new IllegalArgumentException("No puedes superar 10 plazas en total para este evento.");
         }
 
-        // Calcular precio
+        // Si ya existe reserva, actualizarla en vez de crear una nueva
+        if (!reservasCliente.isEmpty()) {
+            Reserva reservaExistente = reservasCliente.get(0);
+            int nuevaCantidad = reservaExistente.getCantidad() + cantidad;
+            BigDecimal nuevoPrecio = evento.getPrecio().multiply(BigDecimal.valueOf(nuevaCantidad));
+
+            reservaExistente.setCantidad(nuevaCantidad);
+            reservaExistente.setPrecioVenta(nuevoPrecio);
+
+            return reservaRepository.save(reservaExistente);
+        }
+
+        // Si no existe, crear una nueva
         BigDecimal precioVenta = evento.getPrecio().multiply(BigDecimal.valueOf(cantidad));
 
-        // Crear y guardar reserva
         Reserva reserva = Reserva.builder()
                 .evento(evento)
                 .usuario(usuario)
