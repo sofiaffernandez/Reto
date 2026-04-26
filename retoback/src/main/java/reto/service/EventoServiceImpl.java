@@ -107,8 +107,7 @@ public class EventoServiceImpl implements EventoService {
     public void deleteOne(Integer id) {
         Evento evento = eventoRepository.findById(id).orElse(null);
         if (evento != null) {
-            eventoRepository.deleteById(id);
-           
+            eventoRepository.deleteById(id);  
         }
         
     }
